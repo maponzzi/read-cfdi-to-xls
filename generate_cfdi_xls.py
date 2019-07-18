@@ -57,7 +57,7 @@ class XmlCfdi(object):
 			try:
 				folio = comp_atributos['folio'] if 'folio' in comp_atributos else comp_atributos['Folio']
 			except:
-				print 'El archivo %s no tiene folio' % xml_file
+				print('El archivo %s no tiene folio' % xml_file)
 				folio = 'sin folio'
 
 			# Voy a calcular los impuestos
@@ -68,9 +68,9 @@ class XmlCfdi(object):
 					if impuestos.hasAttribute('totalImpuestosTrasladados'):
 						total_iva = float(impuestos.getAttribute('totalImpuestosTrasladados'))
 					else:
-						print 'El comprobante %s no tiene IVA' % xml_file
+						print('El comprobante %s no tiene IVA' % xml_file)
 				except Exception as e:
-					print '%s' % str(e)
+					print('%s' % str(e))
 			elif version == 3.3:
 				impuestos = comprobante.getElementsByTagName('cfdi:Impuestos')
 				try:
@@ -78,7 +78,7 @@ class XmlCfdi(object):
 						if item.hasAttribute('TotalImpuestosTrasladados'):
 							total_iva = float(item.getAttribute('TotalImpuestosTrasladados'))
 				except Exception as e:
-					print '%s' % str(e)
+					print('%s' % str(e))
 
 
 			if descuento:
@@ -122,7 +122,7 @@ class XmlCfdi(object):
 				estado = tag_domicilio.getAttribute('estado')
 				pais = tag_domicilio.getAttribute('pais')
 			except:
-				print 'El archivo %s no tiene domicilio' % self.xml_file
+				print('El archivo %s no tiene domicilio' % self.xml_file)
 				pass
 
 			no_exterior = ''
@@ -147,7 +147,7 @@ class XmlCfdi(object):
 			try:
 				uuid = timbre_fiscal.getAttribute('UUID')
 			except:
-				print 'El xml %s no tiene UUID, verificar que este correcto en el validador del SAT' % xml_file
+				print('El xml %s no tiene UUID, verificar que este correcto en el validador del SAT' % xml_file)
 				uuid = None
 
 			cfdi['serie'] = serie
@@ -177,20 +177,20 @@ class XmlCfdi(object):
 				self.cfdi_list.append(cfdi)
 			else:
 				duplicado = {'file': xml_file}
-				print 'El archivo %s esta duplicado, puedes borrarlo!' % xml_file
+				print('El archivo %s esta duplicado, puedes borrarlo!' % xml_file)
 		except Exception as e:
 			exc_type, exc_obj, exc_tb = sys.exc_info()
 			fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-			print '%s, %s, %s' % (exc_type, fname, exc_tb.tb_lineno)
-			print 'Error: %s' % str(e)
-			print 'El archivo %s tiene un error' % xml_file
-			print '----------------------------------------'
+			print('%s, %s, %s' % (exc_type, fname, exc_tb.tb_lineno))
+			print('Error: %s' % str(e))
+			print('El archivo %s tiene un error' % xml_file)
+			print('----------------------------------------')
 
 	def clean_acumulado(self, ws):
 		row_initial = 3
 		row_final = len(ws.rows)
-		for row in xrange(row_initial, row_final):
-			for cell in xrange(0, 20):
+		for row in range(row_initial, row_final):
+			for cell in range(0, 20):
 				ws.write(row, cell, '')
 
 
@@ -212,7 +212,7 @@ class XmlCfdi(object):
 				ws = wb.get_sheet(3)
 				leyenda_total = 'Gran total de Ingresos'
 			self.clean_acumulado(ws)
-			for i in xrange(0, len(cfdi_list)):
+			for i in range(0, len(cfdi_list)):
 				empresa = cfdi_list[i]['rfc']
 				if not empresa in empresas_dict:
 					empresas_dict[empresa] = { 
@@ -246,10 +246,10 @@ class XmlCfdi(object):
 
 			row = start
 			ind = 1
-			for empresa, totales in sorted(empresas_dict.iteritems()):
+			for empresa, totales in sorted(empresas_dict.items()):
 				ws.write(row, 0, ind)
 				ws.write(row, 1, totales['empresa'])
-				for i in xrange(1, 13):
+				for i in range(1, 13):
 					if totales[i] > 0.0:
 						ws.write(row, i+1, totales[i], currency_format)
 				totalxempresa = "SUM(C%i:N%i)" % (row+1, row+1)
@@ -265,7 +265,7 @@ class XmlCfdi(object):
 			row += 1
 			rango = list(string.ascii_uppercase)[2:15]
 			ws.write(row, 1, leyenda_total)
-			for i in xrange(1, 14):
+			for i in range(1, 14):
 				col = rango[i-1]
 				totalxmes = "SUM(%s%i:%s%i)" % (col, start+1, col, row-1)
 				ws.write(row, i+1, xlwt.Formula(totalxmes), currency_format)
@@ -274,7 +274,7 @@ class XmlCfdi(object):
 		if action == 'egresos':
 			ws = wb.get_sheet(1)
 			last_row = len(ws.rows) + 1
-			for i in xrange(0, len(cfdi_list)):
+			for i in range(0, len(cfdi_list)):
 				ind = last_row + i
 				ws.write(ind, 0, cfdi_list[i]['serie'] + cfdi_list[i]['folio'])
 				ws.write(ind, 1, cfdi_list[i]['fecha'], date_format)
@@ -288,7 +288,7 @@ class XmlCfdi(object):
 		if action == 'ingresos':
 			ws = wb.get_sheet(0)
 			last_row = len(ws.rows) + 1
-			for i in xrange(0, len(cfdi_list)):
+			for i in range(0, len(cfdi_list)):
 				ind = last_row + i
 				ws.write(ind, 0, cfdi_list[i]['empresa'])
 				ws.write(ind, 1, cfdi_list[i]['rfc'])
@@ -302,7 +302,7 @@ class XmlCfdi(object):
 		workbook_name = bk.get_workbook_name()
 		os.remove(workbook_name) # Borro el libro del cual cree la copia, para poder guardar los cambios con el mismo nombre
 		wb.save(workbook_name)
-		print 'Listo!'
+		print('Listo!')
 
 
 	def is_duplicated(self, uuid, ls):
@@ -357,8 +357,8 @@ def main(argv):
 	action = args[0]
 	
 	if not action in actions:
-		print 'Debes pasar una de las siguientes acciones %s' % actions
-		print 'Pasaste %s' % action
+		print('Debes pasar una de las siguientes acciones %s' % actions)
+		print('Pasaste %s' % action)
 		sys.exit(0)
 
 	# Se obtiene la lista de archivos
@@ -368,17 +368,17 @@ def main(argv):
 		files = glob.glob(args[1:2])
 	else:
 		files = args[1:]
-		print 'Archivos XML a procesar: %i' % len(files)
+		print('Archivos XML a procesar: %i' % len(files))
 
 	for item in files:
 		xml_file = item
 		if not os.path.isfile(xml_file):
-			print "El archivo " + xml_file + " no existe."
+			print("El archivo " + xml_file + " no existe.")
 		else:
 			xmlcfdi = XmlCfdi(xml_file)
 			xmlcfdi.get_cfdi_data(action)
 
-	print 'Generando %s ...' % action
+	print('Generando %s ...' % action)
 	xmlcfdi.generate_cfdi_on_xls(action)
 
 
